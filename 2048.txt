@@ -1,0 +1,399 @@
+		MoveUtility
+
+int goLeft(Board *board);
+int goUp(Board *board);
+int goDown(Board *board);
+int goRight(Board *board);
+int checkboard(Board *board);
+int processInput();
+int isValidInput(char);
+int isvalid(int);
+char takeInput();
+void playMove(Board *, User , char );
+void eliminatezero(Board *, char );
+char takeInput()
+{
+	char ip;
+	scanf("%c", &ip);
+	fflush(stdin);
+	
+	return ip;
+}
+
+int isValidInput(char letter){
+
+	if ((letter == 'w') || (letter == 'a') || (letter == 's') || (letter == 'd') || (letter == 'W') || (letter == 'A') || (letter == 'S') || (letter = 'D'))
+		return 1;
+	return 0;
+}
+int processInput(Board *board, char inputChar)
+{
+	int check,k;
+	check=isValidInput(inputChar);
+	if (check){
+		eliminatezero(board, inputChar);
+		
+		if ((inputChar == 'a') || (inputChar == 'A')){
+			k=goLeft(board);
+			
+		}
+			
+		else if ((inputChar == 'd') || (inputChar == 'D')){
+			k=goRight(board);
+			
+		}
+		else if ((inputChar == 'w') || (inputChar == 'W')){
+			k=goUp(board);
+			
+		}
+		else if ((inputChar == 's') || (inputChar == 'S')){
+			k=goDown(board);
+			
+		}
+		if (k)
+			return 1;
+		
+			return 0;
+
+	}
+	
+}
+void playMove(Board *board, User *user, char choice){
+	int valid;
+	valid = processInput(board, choice);
+	modifyMoveCountBasedOnProccessInput(user, valid);
+	clearAndRedrawScreen(board);
+	printUser(user);
+	
+}
+void eliminatezero(Board *board, char val){
+	if (val == 'a'){
+		for (int i = 0; i<board->size; i++){
+			for (int j = 0; j<board->size - 1; j++){
+				if (board->table[i][j] == 0){
+					int k = j + 1;
+					while (board->table[i][k] == 0 && k<board->size - 1)
+						k++;
+
+					board->table[i][j] = board->table[i][k];
+					board->table[i][k] = 0;
+					j = k - 1;
+				}
+			}
+		}
+	}
+	if (val == 'd'){
+		for (int i = 0; i<board->size; i++){
+			for (int j = board->size - 1; j>0; j--){
+				if (board->table[i][j] == 0){
+					int k = j - 1;
+					while (board->table[i][k] == 0 && k>0)
+						k--;
+					board->table[i][j] = board->table[i][k];
+					board->table[i][k] = 0;
+					j = k + 1;
+				}
+			}
+		}
+	}
+	if (val == 'w'){
+		for (int i = 0; i<board->size; i++){
+			for (int j = 0; j<board->size - 1; j++){
+				if (board->table[j][i] == 0){
+					int k = j + 1;
+					while (board->table[k][i] == 0 && k<board->size - 1)
+						k++;
+
+					board->table[j][i] = board->table[k][i];
+					board->table[k][i] = 0;
+					j = k - 1;
+				}
+			}
+		}
+	}
+	if (val == 's'){
+		for (int i = 0; i<board->size; i++){
+			for (int j = board->size - 1; j>0; j--){
+				if (board->table[j][i] == 0){
+					int k = j - 1;
+					while (board->table[k][i] == 0 && k>0)
+						k--;
+					board->table[j][i] = board->table[k][i];
+					board->table[k][i] = 0;
+					j = k + 1;
+				}
+			}
+		}
+	}
+}
+int isvalid(int a){
+	int test[17] = { 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584 };
+	for (int k = 0; k < 17; k++)
+		if (a == test[k])
+			return 1;
+
+
+	return 0;
+}
+int goLeft(Board *board)
+{
+	int temp = board->size, k, t = 0;
+
+	for (int r = 0; r < board->size; r++){
+		t = 0;
+		for (int j = 0; j < board->size; j++){
+			for (int i = t; i < temp - 1; i++){
+				int k = i + 1;
+
+				if (isvalid(board->table[r][i] + board->table[r][k])){
+					board->table[r][i] = board->table[r][i] + board->table[r][k];
+					board->table[r][k] = 0;
+
+				}
+			}
+			//temp--;
+			t++;
+		}
+	}
+
+
+	return 0;
+}
+int goRight(Board *board)
+{
+	int temp = board->size, k;
+
+	for (int r = 0; r < board->size; r++){
+		temp = board->size;
+		for (int j = 0; j < board->size; j++){
+			for (int i = temp - 1; i > 0; i--){
+				int k = i - 1;
+				while (board->table[r][k] == 0)
+					k--;
+				if (isvalid(board->table[r][i] + board->table[r][k])){
+					board->table[r][i] = board->table[r][i] + board->table[r][k];
+					board->table[r][k] = 0;
+
+				}
+			}
+			temp--;
+		}
+	}
+
+	return 0;
+}
+int goUp(Board *board){
+	int temp = board->size, k, t = 0;
+
+	for (int r = 0; r < board->size; r++){
+		t = 0;
+		for (int j = 0; j < board->size; j++){
+			for (int i = t; i < temp - 1; i++){
+				int k = i + 1;
+
+				if (isvalid(board->table[i][r] + board->table[k][r])){
+					board->table[i][r] = board->table[i][r] + board->table[k][r];
+					board->table[k][r] = 0;
+
+				}
+			}
+			//temp--;
+			t++;
+		}
+	}
+	return 0;
+}
+int goDown(Board *board){
+	int temp = board->size, k;
+
+	for (int r = 0; r < board->size; r++){
+		temp = board->size;
+		for (int j = 0; j < board->size; j++){
+			for (int i = temp - 1; i > 0; i--){
+				int k = i - 1;
+
+				if (isvalid(board->table[i][r] + board->table[k][r])){
+					board->table[i][r] = board->table[i][r] + board->table[k][r];
+					board->table[k][r] = 0;
+
+				}
+			}
+			temp--;
+		}
+	}
+
+	return 0;
+}
+int checkBoard(Board *board){
+	for (int i = 0; i<board->size; i++)
+		for (int j = 0; j<board->size; j++)
+			if (board->table[i][j] == 2584)
+				return 1;
+	return 0;
+}
+
+_________________________________________________________________________________________________________________________________________________________________________
+
+				UserUtility
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct User{
+	char *name;
+	int movesCount;
+};
+
+
+User * createUser(char *name){
+	User *user = (struct User *)malloc(sizeof(struct User));
+	user->name = name;
+	user->movesCount = 0;
+	return user;
+}
+
+
+
+void modifyMoveCountBasedOnProccessInput(User *user, int processInputOutCome){
+	if (processInputOutCome == 1)
+		user->movesCount++;
+	return;
+}
+
+
+void printUser(User *user){
+	printf("Hey %s ,You played %d Moves", user->name, user->movesCount);
+
+}
+____________________________________________________________________________________________________________________________________________________________________________
+			BoardUtility
+
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Board {
+
+	int **table;
+
+	int size;
+
+};
+Board * createBoard(int size){
+	if (size <= 0)
+		return NULL;
+	struct Board *changeThis = (struct Board *)malloc(sizeof(struct Board));
+	int **newboard;
+	newboard = (int **)malloc(sizeof(int)*size);
+	for (int i = 0; i < size; i++)
+		newboard[i] = (int *)malloc(sizeof(int)*size);
+	changeThis->table = newboard;
+	changeThis->size = size;
+
+	return changeThis;
+}
+void initializeBoard(Board * source, int size){
+	int **copy;
+	if (source == NULL || size < 1)
+		return;
+	copy = (int **)malloc(sizeof(int)*size);
+	for (int i = 0; i < size; i++)
+		copy[i] = (int *)malloc(sizeof(int)*size);
+	for (int i = 0; i < size; i++)
+		for (int j = 0; j < size; j++){
+
+			copy[i][j] = 0;
+
+		}
+	copy[0][0] = 1;
+	source->table = copy;
+}/*
+ int checkBoard(Board * board){
+ int k = 1, i, j;
+ for (i = 0; i < board->rows; i++)
+ for (j = 0; j < board->cols; j++){
+ if ((board->table[i][j] != k) && (k < (board->rows*board->cols)))
+ return 0;
+ k++;
+ }
+
+ return 1;
+ }
+ */
+void drawBoardOnScreen(Board *board){
+
+
+
+	for (int i = 0; i < board->size; i++){
+		for (int j = 0; j < board->size; j++){
+
+			printf("%4d  ", board->table[i][j]);
+
+		}
+		printf("\n");
+	}
+	printf("----------[W] UP --- [S] Down --- [A] LEFT --- [D] Right--------------");
+
+}
+void clearScreen(){
+	system("cls");
+}
+void clearAndRedrawScreen(Board * board){
+	clearScreen();
+	drawBoardOnScreen(board);
+}
+_________________________________________________________________________________________________________________________________________________________________________
+			2048.cpp
+
+#define _CRT_SECURE_NO_WARNINGS
+#include "stdafx.h"
+//Helper Utils
+#include "BoardUtility.h"
+#include "MoveUtility.h"
+#include "UserUtility.h"
+
+
+
+
+int main(){
+
+	
+
+	char name[10], inputChar;
+	int size = 4;
+	struct Board *source = (struct Board *)malloc(sizeof(struct Board));
+	struct User *user;
+	struct Board *board;
+	printf("enter name:");
+	scanf("%s", name);
+
+	user = createUser(name);
+
+	board = createBoard(4);
+
+	initializeBoard(board, size);
+
+	int i = rand() % board->size, j = rand() % board->size;
+	while (board->table[i][j] != 0){
+		i = rand() % board->size;
+		j = rand() % board->size;
+	}
+	board->table[i][j] = 1;
+	clearAndRedrawScreen(board);
+
+	printUser(user);
+
+	while (!checkBoard(board)){
+		inputChar = takeInput();
+		processInput(board, inputChar);
+
+		int i = rand() % board->size, j = rand() % board->size;
+		while (board->table[i][j] != 0){
+			i = rand() % board->size;
+			j = rand() % board->size;
+		}
+		board->table[i][j] = 1;
+		clearAndRedrawScreen(board);
+	}
+	return 0;
+}
